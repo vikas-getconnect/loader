@@ -1,0 +1,48 @@
+{
+  "rating": 529.54,
+  "claim": "CE997A79B3A9689378344D8962B3CB372A7211ACE80C6249B70363D8DEB5D1514D91BEAE0A8498E3",
+  "result": "SUCCESS",
+  "duration": 2698,
+  "build_id": 5919,
+  "city": "13A1D49135",
+  "priority": "59",
+  "state": "FC",
+  "build": "gideon-5",
+  "active_hosts": [
+    "10.143.190.101"
+  ],
+  "type": "gideon",
+  "profile": {
+    "status": "9A0BE4FEB9 05AD8CB30A 0A 6D E33D6A2658D62A6C236F8D2F51D39A06A211D464",
+    "likes": 92416,
+    "friends": [
+      "9FFD2E034A",
+      "088AAE216E",
+      "50DBCA70CF",
+      "CE31B20C83",
+      "75FE27D2E4"
+    ],
+    "name": "CA083710A1F5EB9B3761",
+    "online": true
+  },
+  "description": "2122DE33BFA7F9240592 0B4FD37B58 13EEA2436EC113B37FD61735B600AA 08 08D9BDFA4594135A55076073EC64EB936FE9945D",
+  "component": "BE",
+  "failCount": 0,
+  "totalCount": 44,
+  "ops_sec": 15000,
+  "name": "3A8EDA61F85ECF5676EF",
+  "sizes": [
+    128,
+    256
+  ],
+  "url": "590540D129FA97E61A7672AA7999A14A6A34942C",
+  "bucket": "default",
+  "activity": [
+    "7EFF2EC495053B6A14AAD0DE4B603DC9B194D356",
+    "D07B4D31295B502763371AC96DFC9EE0C6DADD56",
+    "7A995D4B330C7E8DEE382520A104C761E33DD65B",
+    "10493C7BE1",
+    "17E71C3D87D0F237F955A4B6156487"
+  ],
+  "os": "54"
+}
