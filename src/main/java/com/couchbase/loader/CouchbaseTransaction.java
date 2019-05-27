@@ -8,7 +8,6 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.transactions.Transactions;
 import com.couchbase.transactions.config.TransactionConfig;
 import com.google.common.util.concurrent.RateLimiter;
-import lombok.extern.slf4j.Slf4j;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
