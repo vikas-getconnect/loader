@@ -1,4 +1,4 @@
-package com.couchbase;
+package com.couchbase.loader;
 
 import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.kv.PersistTo;

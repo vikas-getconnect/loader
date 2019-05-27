@@ -1,15 +1,15 @@
-package com.couchbase;
+package com.couchbase.loader;
 
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 
 import com.couchbase.transactions.Transactions;
-import com.google.common.util.concurrent.RateLimiter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import reactor.util.function.Tuple2;
 
 import java.util.List;
 import java.util.Queue;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class RunTransactions implements Runnable {
@@ -22,6 +22,7 @@ public class RunTransactions implements Runnable {
     private Boolean sync;
     private TransactionHelper transactionHelper=new TransactionHelper();
     private ReadArgs readArgs;
+    private static final Logger log = LogManager.getLogger(RunTransactions.class);
 
     RunTransactions(Transactions trans, Collection collections, List<Tuple2<String, JsonObject>> doc, ReadArgs param){
             this.trans=trans;
@@ -33,7 +34,7 @@ public class RunTransactions implements Runnable {
     @Override
     public void run() {
         CouchbaseTransaction transaction=new CouchbaseTransaction();
-        System.out.println(Thread.currentThread().getName());
+        log.debug(Thread.currentThread().getName());
         Queue<String> ids = batchInsert(trans, collections, doc);
         //System.out.println("update count:"+readArgs.getUpdateCount());
         if(readArgs.getUpdateCount() > 0) {

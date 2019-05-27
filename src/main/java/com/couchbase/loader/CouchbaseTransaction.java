@@ -1,4 +1,4 @@
-package com.couchbase;
+package com.couchbase.loader;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
@@ -7,27 +7,28 @@ import com.couchbase.client.java.env.ClusterEnvironment;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.transactions.Transactions;
 import com.couchbase.transactions.config.TransactionConfig;
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Slf4j
 public class CouchbaseTransaction {
     private static final String CHAR_LIST =
             "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final int NTHREDS=8;
     private static TransactionHelper transactionHelper=new TransactionHelper();
+    private static final Logger log = LogManager.getLogger(CouchbaseTransaction.class);
 
 
     public static void main(String[] args) throws InterruptedException {
@@ -44,17 +45,21 @@ public class CouchbaseTransaction {
         Transactions tr = transactionHelper.createTansaction(cluster,config);
         log.info("transaction created");
         //System.out.println("transaction created");
-        while (true){
-            ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
-            for (int i = 0; i < param.getThreads(); i++) {
-                List<Tuple2<String, JsonObject>> documents = couchbaseTransaction.getDocumentsJson(param.getCreateCount());
-                RunTransactions worker = new RunTransactions(tr, collection, documents,param);
-                executor.execute(worker);
+        while (true) {
+            RateLimiter rateLimiter = RateLimiter.create(1);
+            if (rateLimiter.tryAcquire()) {
+                rateLimiter.acquire();
+                ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
+                for (int i = 0; i < param.getThreads(); i++) {
+                    List<Tuple2<String, JsonObject>> documents = couchbaseTransaction.getDocumentsJson(param.getCreateCount());
+                    RunTransactions worker = new RunTransactions(tr, collection, documents, param);
+                    executor.execute(worker);
+                }
+                executor.shutdown();
+                // Wait until all threads are finish
+                executor.awaitTermination(600, TimeUnit.SECONDS);
+                log.info("Finished all threads");
             }
-            executor.shutdown();
-            // Wait until all threads are finish
-            executor.awaitTermination(600, TimeUnit.SECONDS);
-            System.out.println("Finished all threads");
         }
 //        while (true){
 //            final ScheduledThreadPoolExecutor service = new ScheduledThreadPoolExecutor(NTHREDS);

@@ -1,4 +1,4 @@
-package com.couchbase;
+package com.couchbase.loader;
 
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
@@ -9,6 +9,8 @@ import com.couchbase.transactions.config.TransactionConfig;
 import com.couchbase.transactions.config.TransactionConfigBuilder;
 import com.couchbase.transactions.error.TransactionFailed;
 import com.couchbase.transactions.log.LogDefer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 public class TransactionHelper {
     Queue<String> queue=new LinkedList<>();
+    private static final Logger log = LogManager.getLogger(TransactionHelper.class);
+
 
     public TransactionConfig createTransactionConfig(int expiryTimeout, int durabilitylevel) {
         TransactionConfigBuilder config = TransactionConfigBuilder.create();
@@ -57,11 +61,11 @@ public class TransactionHelper {
                 return (Mono<Void>) m.get("insert");
             }).block();
         } catch (TransactionFailed e) {
-            System.out.println("Transaction " + e.result().transactionId() + " failed:");
-            System.out.println("Error: " + e.result());
+            log.error("Transaction " + e.result().transactionId() + " failed:");
+            log.error("Error: " + e.result());
             for (LogDefer err : e.result().log().logs()) {
                 if (err != null)
-                    System.out.println(err.toString());
+                    log.error(err.toString());
             }
             e.printStackTrace();
         }
@@ -95,11 +99,11 @@ public class TransactionHelper {
             }).block();
             //System.out.println("result: "+result.log().logs());
         } catch (TransactionFailed e) {
-            System.out.println("Transaction " + e.result().transactionId() + " failed:");
-            System.out.println("Error: " + e.result());
+            log.error("Transaction " + e.result().transactionId() + " failed:");
+            log.error("Error: " + e.result());
             for (LogDefer err : e.result().log().logs()) {
                 if (err != null)
-                    System.out.println(err.toString());
+                    log.error(err.toString());
             }
         }
     }
@@ -128,11 +132,11 @@ public class TransactionHelper {
 //                    System.out.println(err.toString());
 //            }
         } catch (TransactionFailed e) {
-            System.out.println("Transaction " + e.result().transactionId() + " failed:");
-            System.out.println("Error: " + e.result());
+           log.error("Transaction " + e.result().transactionId() + " failed:");
+            log.error("Error: " + e.result());
             for (LogDefer err : e.result().log().logs()) {
                 if (err != null)
-                    System.out.println(err.toString());
+                    log.error(err.toString());
             }
         }
     }

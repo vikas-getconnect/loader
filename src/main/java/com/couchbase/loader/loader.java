@@ -1,11 +1,10 @@
-package com.couchbase;
+package com.couchbase.loader;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.env.ClusterEnvironment;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.transactions.Transactions;
 import com.couchbase.transactions.TransactionsReactive;
 import com.couchbase.transactions.config.TransactionConfig;
 import com.google.common.util.concurrent.RateLimiter;
@@ -18,10 +17,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 public class loader {
     private static final String CHAR_LIST =
