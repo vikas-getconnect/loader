@@ -1,21 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="INFO">
     <Appenders>
-        <Console name="LogToConsole" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
         <File name="LogToFile" fileName="logs/loader.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+        </File>
+        <File name="LogToClientFile" fileName="logs/client.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+        </File>
+        <File name="LogToTranFile" fileName="logs/trans.log">
             <PatternLayout>
                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
             </PatternLayout>
         </File>
     </Appenders>
     <Loggers>
-        <Logger name="com.couchbase.loader" level="info" additivity="false">
+        <Root level="INFO">
+            <AppenderRef ref="LogToFile"/>
+        </Root>
+        <Logger name="com.couchbase.loader" level="ERROR" additivity="false">
             <AppenderRef ref="LogToFile"/>
         </Logger>
-        <Root level="info">
-            <AppenderRef ref="LogToConsole"/>
-        </Root>
+        <Logger name="com.couchbase.transactions" level="ERROR" additivity="false">
+            <AppenderRef ref="LogToTranFile"/>
+        </Logger>
+        <Logger name="com.couchbase.client.core" level="DEBUG" additivity="false">
+            <AppenderRef ref="LogToClientFile"/>
+        </Logger>
+
     </Loggers>
 </Configuration>
