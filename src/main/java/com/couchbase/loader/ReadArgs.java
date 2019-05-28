@@ -1,8 +1,8 @@
 package com.couchbase.loader;
 
-import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.kv.PersistTo;
 import com.couchbase.client.java.kv.ReplicateTo;
+import com.couchbase.transactions.TransactionDurabilityLevel;
 import org.apache.commons.cli.*;
 
 import java.time.Duration;
@@ -15,7 +15,7 @@ public class ReadArgs {
     private String password;
     private PersistTo persistTo;
     private ReplicateTo replicateTo;
-    private DurabilityLevel durability;
+    private TransactionDurabilityLevel durability;
     private String bucket;
     private String collection;
     private Integer ops;
@@ -143,11 +143,11 @@ public class ReadArgs {
         this.replicateTo = replicateTo;
     }
 
-    public DurabilityLevel getDurability() {
+    public TransactionDurabilityLevel getDurability() {
         return durability;
     }
 
-    public void setDurability(DurabilityLevel durability) {
+    public void setDurability(TransactionDurabilityLevel durability) {
         this.durability = durability;
     }
 
@@ -209,8 +209,8 @@ public class ReadArgs {
         options.addOption(host);
         options.addOption(username);
         options.addOption(password);
-        options.addOption(replicateTo);
-        options.addOption(persistTo);
+        //options.addOption(replicateTo);
+        //options.addOption(persistTo);
         options.addOption(durability);
         options.addOption(bucket);
         options.addOption(ops);
@@ -236,7 +236,7 @@ public class ReadArgs {
         return cmd;
     }
 
-    public void setArgs(String[] args){
+    public CommandLine setArgs(String[] args){
         CommandLine cmd=getArgs(args);
         hostname=cmd.getOptionValue("h");
         if(cmd.getOptionValue("user")==null){
@@ -251,9 +251,6 @@ public class ReadArgs {
         if(cmd.getOptionValue("t")==null){
             time=172800;
         }
-        if(cmd.getOptionValue("durability")!=null){
-            durability=getDurabilityLevel(cmd.getOptionValue("durability"));
-        }
         if(cmd.getOptionValue("persistTo")==null){
             persistTo=getPersistTo(0);
         }
@@ -266,13 +263,14 @@ public class ReadArgs {
         if(cmd.getOptionValue("type")==null){
             type="bulk";
         }
+        durability=getDurabilityLevel(cmd.getOptionValue("durability"));
         type=cmd.getOptionValue("type");
         ops = (cmd.getOptionValue("o")==null) ? 1000 : Integer.parseInt(cmd.getOptionValue("o"));
         threads = (cmd.getOptionValue("t")==null) ? 8 : Integer.parseInt(cmd.getOptionValue("t"));
         createCount = (Integer.parseInt(cmd.getOptionValue("c"))*ops/100)/threads;
         updateCount = (cmd.getOptionValue("u")==null) ? 0 :(Integer.parseInt(cmd.getOptionValue("u"))*ops/100)/threads;
         deleteCount = (cmd.getOptionValue("d")==null) ? 0 :(Integer.parseInt(cmd.getOptionValue("d"))*ops/100)/threads;
-
+        return cmd;
     }
 
     private PersistTo getPersistTo(int persistTo) {
@@ -308,17 +306,21 @@ public class ReadArgs {
         }
     }
 
-    private DurabilityLevel getDurabilityLevel(String durabilityLevel) {
+    private TransactionDurabilityLevel getDurabilityLevel(String durabilityLevel) {
+        if(durabilityLevel==null)
+            return TransactionDurabilityLevel.NONE;
         if (durabilityLevel.equalsIgnoreCase("MAJORITY")) {
-            return DurabilityLevel.MAJORITY;
+            return TransactionDurabilityLevel.MAJORITY;
         }
         if (durabilityLevel.equalsIgnoreCase("MAJORITY_AND_PERSIST_ON_MASTER")) {
-            return DurabilityLevel.MAJORITY_AND_PERSIST_ON_MASTER;
+            return TransactionDurabilityLevel.MAJORITY_AND_PERSIST_ON_MASTER;
         }
         if (durabilityLevel.equalsIgnoreCase("PERSIST_TO_MAJORITY")) {
-            return DurabilityLevel.PERSIST_TO_MAJORITY;
+            return TransactionDurabilityLevel.PERSIST_TO_MAJORITY;
         }
-        return null;
+        else {
+            return TransactionDurabilityLevel.NONE;
+        }
     }
 
     private Duration getDuration(long time, String timeUnit) {

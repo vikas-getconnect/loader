@@ -1,5 +1,6 @@
 package com.couchbase.loader;
 
+import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.ReactiveCollection;
@@ -25,24 +26,9 @@ public class TransactionHelper {
     private static final Logger log = LogManager.getLogger(TransactionHelper.class);
 
 
-    public TransactionConfig createTransactionConfig(int expiryTimeout, int durabilitylevel) {
+    public TransactionConfig createTransactionConfig(int expiryTimeout, TransactionDurabilityLevel durabilitylevel) {
         TransactionConfigBuilder config = TransactionConfigBuilder.create();
-        switch(durabilitylevel) {
-            case 0:
-                config.durabilityLevel(TransactionDurabilityLevel.NONE);
-                break;
-            case 1:
-                config.durabilityLevel(TransactionDurabilityLevel.MAJORITY);
-                break;
-            case 2:
-                config.durabilityLevel(TransactionDurabilityLevel.MAJORITY_AND_PERSIST_ON_MASTER);
-                break;
-            case 3:
-                config.durabilityLevel(TransactionDurabilityLevel.PERSIST_TO_MAJORITY);
-                break;
-            default:
-                config.durabilityLevel(TransactionDurabilityLevel.NONE);
-        }
+        config.durabilityLevel(durabilitylevel);
 
         return config.expirationTime(Duration.of((long)expiryTimeout, ChronoUnit.SECONDS)).build();
     }

@@ -5,9 +5,11 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.env.ClusterEnvironment;
 import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.transactions.TransactionDurabilityLevel;
 import com.couchbase.transactions.Transactions;
 import com.couchbase.transactions.config.TransactionConfig;
 import com.google.common.util.concurrent.RateLimiter;
+import org.apache.commons.cli.CommandLine;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -34,8 +36,9 @@ public class CouchbaseTransaction {
         CouchbaseTransaction couchbaseTransaction=new CouchbaseTransaction();
         ReadArgs param= new ReadArgs();
         param.setArgs(args);
-
-        TransactionConfig config = transactionHelper.createTransactionConfig(600, 0);
+        TransactionDurabilityLevel durability = param.getDurability();
+        log.info("Durability level:"+durability);
+        TransactionConfig config = transactionHelper.createTransactionConfig(600, durability);
 
         Cluster cluster=Cluster.connect(ClusterEnvironment.create(param.getHostname(),param.getUsername(),param.getPassword()));
         Bucket bucket=cluster.bucket("default");
@@ -60,19 +63,6 @@ public class CouchbaseTransaction {
                 log.info("Finished all threads");
             }
         }
-//        while (true){
-//            final ScheduledThreadPoolExecutor service = new ScheduledThreadPoolExecutor(NTHREDS);
-//            for (int i = 0; i < param.getThreads(); i++) {
-//                List<Tuple2<String, JsonObject>> documents = couchbaseTransaction.getDocumentsJson(param.getCreateCount());
-//                int delay = 1000 * service.getQueue().size() / param.getOps();
-//                RunTransactions worker = new RunTransactions(tr, collection, documents,param);
-//                service.schedule(worker,delay,TimeUnit.MILLISECONDS);
-//            }
-//            service.shutdown();
-//            service.awaitTermination(60,TimeUnit.SECONDS);
-//            System.out.println("Finished all threads");
-//        }
-
     }
 
 
