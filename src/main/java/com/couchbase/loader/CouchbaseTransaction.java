@@ -75,12 +75,10 @@ public class CouchbaseTransaction {
     }
 
     public  List<Tuple2<String, JsonObject>> getDocumentsJson(Integer number){
-        List<String> keys=generateKeys(number);
         JsonObject json = JsonObject.fromJson(getJson());
         List<Tuple2<String,JsonObject>> doc=new ArrayList<>();
-        for (String key:keys) {
-            //key= key+"-"+ System.nanoTime();
-            Tuple2<String, JsonObject> jdoc=Tuples.of(key,json);
+        for(int i=0;i<number;i++) {
+            Tuple2<String, JsonObject> jdoc=Tuples.of(String.valueOf(i),json);
             doc.add(jdoc);
         }
         return doc;

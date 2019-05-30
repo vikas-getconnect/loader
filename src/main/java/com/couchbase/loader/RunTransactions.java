@@ -33,9 +33,8 @@ public class RunTransactions implements Runnable {
 
     @Override
     public void run() {
-        CouchbaseTransaction transaction=new CouchbaseTransaction();
         log.debug(Thread.currentThread().getName());
-        Queue<String> ids = batchInsert(trans, collections, doc);
+        Queue<String> ids = batchInsert(trans, collections, doc,Thread.currentThread().getName());
         //System.out.println("update count:"+readArgs.getUpdateCount());
         if(readArgs.getUpdateCount() > 0) {
             List<String> updatelist = ids.stream().limit(readArgs.getUpdateCount()).collect(Collectors.toList());
@@ -48,8 +47,8 @@ public class RunTransactions implements Runnable {
         }
     }
 
-    public Queue<String> batchInsert(Transactions transaction, Collection collection, List<Tuple2<String, JsonObject>> documents){
-        return transactionHelper.multiInsertSingelTransaction(transaction,collection,documents);
+    public Queue<String> batchInsert(Transactions transaction, Collection collection, List<Tuple2<String, JsonObject>> documents,String thread){
+        return transactionHelper.multiInsertSingelTransaction(transaction,collection,documents,thread);
     }
 
     public void batchUpdate(Transactions transaction,Collection collection,List<String> ids){

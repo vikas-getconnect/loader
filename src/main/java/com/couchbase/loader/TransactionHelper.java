@@ -38,11 +38,11 @@ public class TransactionHelper {
     }
 
 
-    public Queue<String> multiInsertSingelTransaction(Transactions transaction, Collection collection, List<Tuple2<String, JsonObject>> documents) {
+    public Queue<String> multiInsertSingelTransaction(Transactions transaction, Collection collection, List<Tuple2<String, JsonObject>> documents,String thread) {
         final Queue<String>[] res = new Queue[]{new LinkedList<>()};
         try {
             transaction.reactive((ctx) -> {
-                Map<String, Object> m = insertMulti(ctx, transaction, collection, documents);
+                Map<String, Object> m = insertMulti(ctx, transaction, collection, documents,thread);
                 res[0]= (Queue<String>) m.get("ids");
                 return (Mono<Void>) m.get("insert");
             }).block();
@@ -59,17 +59,17 @@ public class TransactionHelper {
         return res[0];
     }
 
-    public Map<String, Object> insertMulti(AttemptContextReactive acr, Transactions transaction, Collection collection, List<Tuple2<String, JsonObject>> documents){
+    public Map<String, Object> insertMulti(AttemptContextReactive acr, Transactions transaction, Collection collection, List<Tuple2<String, JsonObject>> documents,String thread){
         Map<String,Object> map=new HashMap<>();
         Queue<String> ids=new LinkedList<>();
         ReactiveCollection reactiveCollection=collection.reactive();
-        String id1 = documents.get(0).getT1();
+        String id1 = thread+"_" + System.nanoTime();
         JsonObject content1 = documents.get(0).getT2();
         List<Tuple2<String, JsonObject>> remainingDocs = documents.stream().skip(1).collect(Collectors.toList());
         Mono<Void> multiInsert = acr.insert(reactiveCollection, id1, content1).map(i -> ids.add(i.id()))
                 .flatMapMany(v -> Flux.fromIterable(remainingDocs)
                         .flatMap(doc ->
-                                        acr.insert(reactiveCollection, doc.getT1() + System.nanoTime(), doc.getT2())
+                                        acr.insert(reactiveCollection, thread+"_"+ System.nanoTime(), doc.getT2())
                                 , remainingDocs.size()
                         ).map(t -> ids.add(t.id()))
                 ).then();
