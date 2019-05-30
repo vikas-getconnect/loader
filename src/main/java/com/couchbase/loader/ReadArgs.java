@@ -28,7 +28,7 @@ public class ReadArgs {
     private Integer deleteCount;
 
     public Integer getCreateCount() {
-        return createCount;
+        return createCount/2;
     }
 
     public void setCreateCount(Integer createCount) {
@@ -36,7 +36,7 @@ public class ReadArgs {
     }
 
     public Integer getUpdateCount() {
-        return updateCount;
+        return updateCount/2;
     }
 
     public void setUpdateCount(Integer updateCount) {
@@ -44,7 +44,7 @@ public class ReadArgs {
     }
 
     public Integer getDeleteCount() {
-        return deleteCount;
+        return deleteCount/2;
     }
 
     public void setDeleteCount(Integer deleteCount) {
